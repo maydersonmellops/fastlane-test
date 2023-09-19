@@ -11,7 +11,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Checkout to git repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          yarn install
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
@@ -19,8 +28,13 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
-      # - name: Run tests
-      #   run: bundle exec fastlane android test
+      - name: Install Fastlane
+        run: |
+          bundle install
+          bundle update fastlane
+
+      - name: Run tests
+        run: bundle exec fastlane android test
 
       - name: Decode Service Account Key JSON File
         uses: timheuer/base64-to-file@v1
