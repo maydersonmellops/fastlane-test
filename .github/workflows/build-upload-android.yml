@@ -29,10 +29,13 @@ jobs:
           bundler-cache: true
 
       - name: Install Fastlane
-        uses: maierj/fastlane-action@v3.0.0
-        with:
-          lane: 'test'
-          subdirectory: 'android'
+        run: gem install fastlane
+
+      # - name: Install Fastlane
+      #   uses: maierj/fastlane-action@v3.0.0
+      #   with:
+      #     lane: 'test'
+      #     subdirectory: 'android'
 
       - name: Run tests
         run: bundle exec fastlane android test
