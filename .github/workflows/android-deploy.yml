@@ -11,6 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/setup-node@v3
         with:
@@ -48,29 +51,10 @@ jobs:
           keyStorePassword: ${{ secrets.APP_INSTALADOR_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.APP_INSTALADOR_KEY_PASSWORD }}
 
-      # - name: Tag Release
-      #   run: |
-      #     version_name=${GITHUB_REF##*/}
-      #     echo "Tagging release with tag $version_name"
-      #     git tag $version_name release/$version_name
-      #     git push origin --tags
-
       - name: Bump version
-        uses: chkfung/android-version-actions@v1.2.1
-        with:
-          gradlePath: android/app/build.gradle
-          # versionCode: ${{github.run_number}}
-          # versionName: 1.0.0
-
-      - name: Commit and push version change
         run: |
-          git config user.name "${{ secrets.USERNAME_GITHUB }}"
-          git config user.email "${{ secrets.GITHUB_EMAIL }}"
-          git add android/app/build.gradle
-          git commit -m "chore: Atualizado versão do APP"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          chmod +x android/increment-version.sh
+          ./android/increment-version.sh
 
       - name: Create service_account.json
         run: echo '${{ secrets.GPLAY_SERVICE_ACCOUNT_KEY_JSON }}' > service_account.json
@@ -83,3 +67,9 @@ jobs:
           releaseFile: android/app/build/outputs/bundle/release/app-release.aab
           track: alpha
           whatsNewDirectory: distribution/
+
+      - name: Commit and push version change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'chore: Atualizado versionCode e versionName'
+          file_pattern: 'android/app/build.gradle'
