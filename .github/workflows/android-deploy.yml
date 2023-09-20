@@ -30,6 +30,9 @@ jobs:
           java-version: 17
 
       - name: Build
+        run: cd android && ./gradlew clean && cd ..
+
+      - name: Build
         run: cd android && ./gradlew build && cd ..
 
       - name: Assemble Release Bundle
@@ -51,6 +54,13 @@ jobs:
       #     echo "Tagging release with tag $version_name"
       #     git tag $version_name release/$version_name
       #     git push origin --tags
+
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: android/app/build.gradle
+          # versionCode: ${{github.run_number}}
+          # versionName: 1.0.0
 
       - name: Commit and push version change
         run: |
