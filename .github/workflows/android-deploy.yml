@@ -45,12 +45,22 @@ jobs:
           keyStorePassword: ${{ secrets.APP_INSTALADOR_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.APP_INSTALADOR_KEY_PASSWORD }}
 
-      - name: Tag Release
+      # - name: Tag Release
+      #   run: |
+      #     version_name=${GITHUB_REF##*/}
+      #     echo "Tagging release with tag $version_name"
+      #     git tag $version_name release/$version_name
+      #     git push origin --tags
+
+      - name: Commit and push version change
         run: |
-          version_name=${GITHUB_REF##*/}
-          echo "Tagging release with tag $version_name"
-          git tag $version_name release/$version_name
-          git push origin --tags
+          git config user.name "${{ secrets.USERNAME_GITHUB }}"
+          git config user.email "${{ secrets.GITHUB_EMAIL }}"
+          git add android/app/build.gradle
+          git commit -m "chore: Atualizado versão do APP"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create service_account.json
         run: echo '${{ secrets.GPLAY_SERVICE_ACCOUNT_KEY_JSON }}' > service_account.json
