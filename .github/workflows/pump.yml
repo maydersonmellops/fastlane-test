@@ -1,0 +1,37 @@
+name: Android Deploy
+
+on:
+  push:
+    branches:
+      - staging
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to git repository
+        uses: actions/checkout@v4
+
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: android/app/build.gradle
+          # versionCode: ${{github.run_number}}
+          # versionName: 1.0.0
+
+      - name: Show build.gradle
+        run: |
+          cat android/app/build.gradle | grep versionCode && cat android/app/build.gradle | grep versionName
+
+      - name: Commit and push version change
+        run: |
+          git config user.name "${{ secrets.USERNAME_GITHUB }}"
+          git config user.email "${{ secrets.GITHUB_EMAIL }}"
+          git add android/app/build.gradle
+          git commit -m "chore: Atualizado versão do APP"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
