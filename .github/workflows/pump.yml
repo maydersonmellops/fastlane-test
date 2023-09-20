@@ -34,3 +34,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'chore: Atualizado versionCode e versionName'
+          file_pattern: 'android/app/build.gradle'
