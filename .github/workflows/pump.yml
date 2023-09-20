@@ -11,6 +11,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+
     steps:
       - name: Checkout to git repository
         uses: actions/checkout@v4
@@ -26,11 +31,6 @@ jobs:
           cat android/app/build.gradle | grep versionName
 
       - name: Commit and push version change
-        run: |
-          git config user.name "${{ secrets.USERNAME_GITHUB }}"
-          git config user.email "${{ secrets.GITHUB_EMAIL }}"
-          git add android/app/build.gradle
-          git commit -m "chore: Atualizado versão do APP"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'chore: Atualizado versionCode e versionName'
