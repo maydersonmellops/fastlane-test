@@ -1,0 +1,64 @@
+name: Android Deploy
+
+on:
+  push:
+    branches:
+      - staging
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Checkout to git repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          yarn install
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+
+      - name: Build
+        run: cd android && ./gradlew build && cd ..
+
+      - name: Assemble Release Bundle
+        run: |
+          cd android && ./gradlew bundleRelease && cd ..
+
+      - name: Sign Release
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: android/app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.APP_INSTALADOR_STORE_FILE }}
+          alias: ${{ secrets.APP_INSTALADOR_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.APP_INSTALADOR_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.APP_INSTALADOR_KEY_PASSWORD }}
+
+      - name: Tag Release
+        run: |
+          version_name=${GITHUB_REF##*/}
+          echo "Tagging release with tag $version_name"
+          git tag $version_name release/$version_name
+          git push origin --tags
+
+      - name: Create service_account.json
+        run: echo '${{ secrets.GPLAY_SERVICE_ACCOUNT_KEY_JSON }}' > service_account.json
+
+      - name: Deploy to Alpha
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.fastlane
+          releaseFile: android/app/build/outputs/bundle/release/app-release.aab
+          track: alpha
+          whatsNewDirectory: distribution/
