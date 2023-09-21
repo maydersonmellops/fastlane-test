@@ -31,10 +31,6 @@ jobs:
         run: |
           ruby --version
 
-      - name: Default scheme
-        run: |
-          name: Set Default Scheme
-
       - name: Build
         env:
           scheme: ${{ 'default' }}
