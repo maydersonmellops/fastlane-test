@@ -52,14 +52,10 @@ jobs:
           ruby-version: 2.6
           bundler-cache: true
 
-      - name: Access ios
-        run: cd ios
-
       - name: Install Pods
-        run: pod install --repo-update 
+        run: cd ios && pod install --repo-update && cd ..
 
-      - name: Return main folder 
-        run: cd ..
+      
 
       
 
