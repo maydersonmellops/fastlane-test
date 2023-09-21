@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - 'ios'
+
+  workflow_dispatch:
 jobs:
-  build:
+  deploy:
     runs-on: macos-latest
+    
     steps:
         uses: actions/checkout@v2
       - run: fastlane beta
