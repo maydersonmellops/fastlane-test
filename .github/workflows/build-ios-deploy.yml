@@ -31,9 +31,11 @@ jobs:
         run: |
           ruby --version
 
-      - name: Version ruby
+      - name: Default scheme
         run: |
           name: Set Default Scheme
+          
+      - name: Version ruby
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
@@ -52,6 +54,6 @@ jobs:
       - name: Ios version
         run: |
           fastlane beta
-          
+
 
       
