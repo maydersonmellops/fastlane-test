@@ -23,10 +23,6 @@ jobs:
         run: |
           gem install fastlane
 
-      - name: Install xcode-select
-        run: |
-          xcode-select --install
-
       - name: Install ruby
         run: |
           brew install ruby
