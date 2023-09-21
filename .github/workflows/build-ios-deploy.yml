@@ -19,6 +19,10 @@ jobs:
       - name: Checkout to git repository
         uses: actions/checkout@v4
 
+      - name: Install gem fastlane
+        run: |
+          gem install fastlane
+
       - name: Ios version
         run: |
           fastlane beta
