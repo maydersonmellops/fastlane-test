@@ -26,6 +26,7 @@ if linkage != nil
 end
 
 target 'fastlane' do
+  project 'fastlane'
   config = use_native_modules!
 
   # Flags change depending on the env values.
