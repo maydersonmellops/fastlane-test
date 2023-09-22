@@ -38,6 +38,9 @@ jobs:
           ./gradlew clean
           cd ..
 
+      - name: Show RAM
+        run: free -h
+
       - name: Build
         run: |
           cd android
