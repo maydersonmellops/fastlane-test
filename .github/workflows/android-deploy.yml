@@ -39,7 +39,7 @@ jobs:
           cd ..
 
       - name: Show RAM
-        run: free -h
+        run: free -h && lscpu
 
       - name: Build
         run: |
