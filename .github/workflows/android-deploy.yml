@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn install
+          yarn install --frozen-lockfile --network-timeout 300000
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -33,14 +33,22 @@ jobs:
           java-version: 17
 
       - name: Clean build
-        run: cd android && ./gradlew clean && cd ..
+        run: |
+          cd android
+          ./gradlew clean
+          cd ..
 
       - name: Build
-        run: cd android && ./gradlew build && cd ..
+        run: |
+          cd android
+          ./gradlew build
+          cd ..
 
       - name: Assemble Release Bundle
         run: |
-          cd android && ./gradlew bundleRelease && cd ..
+          cd android
+          ./gradlew bundleRelease
+          cd ..
 
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
@@ -65,7 +73,7 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.fastlane
           releaseFile: android/app/build/outputs/bundle/release/app-release.aab
-          track: alpha
+          track: internal
           whatsNewDirectory: distribution/
 
       - name: Commit and push version change
