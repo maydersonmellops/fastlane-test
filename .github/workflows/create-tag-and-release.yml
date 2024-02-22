@@ -1,4 +1,4 @@
-name: Create/update tag
+name: Create Tag and Release
 
 on:
   workflow_dispatch:
@@ -24,3 +24,20 @@ jobs:
           tag: v${{ steps.get_package_version.outputs.version }}
           tag_exists_error: false
           message: 'Latest release'
+
+      - name: Extract changelog for release version
+        run: |
+          chmod +x extract-changelog.sh
+          ./extract-changelog.sh
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: v${{ github.ref }}
+          body_path: RELEASE.md
+          draft: false
+          prerelease: false
