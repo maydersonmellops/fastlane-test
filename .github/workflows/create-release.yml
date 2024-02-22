@@ -34,6 +34,7 @@ jobs:
     steps:
       - name: Extract changelog for release version
         run: |
+          ls -la
           chmod +x extract-changelog.sh
           ./extract-changelog.sh
           cat RELEASE.md
