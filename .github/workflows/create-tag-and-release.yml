@@ -36,8 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: v${{ github.ref }}
+          tag_name: v${{ steps.get_package_version.outputs.version }}
+          release_name: v${{ steps.get_package_version.outputs.version }}
           body_path: RELEASE.md
           draft: false
           prerelease: false
