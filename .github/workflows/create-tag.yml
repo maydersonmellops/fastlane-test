@@ -1,0 +1,20 @@
+name: Create Tag
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Create Tag'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to git repository
+        uses: actions/checkout@v4
+
+      - name: Create tag
+        run: |
+          version=$(jq -r '.version' package.json)
+          git tag v$version
+          git push v$version
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
