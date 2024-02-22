@@ -23,11 +23,3 @@ jobs:
           tag: v${{ steps.get_package_version.outputs.version }}
           tag_exists_error: false
           message: 'Latest release'
-
-      # Print result using the env variable.
-      - run: |
-        echo "Tag already present: ${{ env.TAG_EXISTS }}"
-
-      # Print result using the action output.
-      - run: |
-        echo "Tag already present: ${{ steps.tag_create.outputs.tag_exists }}"
