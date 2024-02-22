@@ -1,28 +1,33 @@
-name: Create Tag
+name: Create/update tag
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: 'Create Tag'
+  create-tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout to git repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Configure Git User
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create tag
+      - name: Get package version
+        id: get_package_version
         run: |
           version=$(jq -r '.version' package.json)
-          git tag v$version
-          git push origin v$version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "::set-output name=version::$version"
+
+      - uses: rickstaa/action-create-tag@v1
+        id: 'tag_create'
+        with:
+          tag: v${{ steps.get_package_version.outputs.version }}
+          tag_exists_error: false
+          message: 'Latest release'
+
+      # Print result using the env variable.
+      - run: |
+        echo "Tag already present: ${{ env.TAG_EXISTS }}"
+
+      # Print result using the action output.
+      - run: |
+        echo "Tag already present: ${{ steps.tag_create.outputs.tag_exists }}"
