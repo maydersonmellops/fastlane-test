@@ -11,10 +11,18 @@ jobs:
       - name: Checkout to git repository
         uses: actions/checkout@v4
 
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create tag
         run: |
           version=$(jq -r '.version' package.json)
           git tag v$version
-          git push v$version
+          git push origin v$version
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
