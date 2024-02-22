@@ -8,25 +8,50 @@ name: Create Release
 on:
   workflow_dispatch:
 
+# jobs:
+#   build:
+#     name: 'Create Release'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: CSchoel/release-notes-from-changelog@v1.3.0
+#         with:
+#           version: 0.2.0
+#       - name: Create Release using GitHub CLI
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: >
+#           gh release create
+#           -d
+#           -F RELEASE.md
+#           -t "Version $RELEASE_VERSION"
+#           ${GITHUB_REF#refs/*/}
+
 jobs:
   build:
     name: 'Create Release'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: CSchoel/release-notes-from-changelog@v1.3.0
-        with:
-          version: 0.2.0
-      - name: Create Release using GitHub CLI
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          gh release create
-          -d
-          -F RELEASE.md
-          -t "Version $RELEASE_VERSION"
-          ${GITHUB_REF#refs/*/}
+      - name: Set env # required to get 'vX.Y.Z' instead of 'refs/tag/vX.Y.Z'
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: Extract changelog for release version
+        run: |
+          cp RELEASE_HEAD.md RELEASE.md
+          printf "\n" >> RELEASE.md
+          sed -e "/^## \\[${RELEASE_VERSION:1}\\]/,/^## / ! d" CHANGELOG.md | head -n -2 >> RELEASE.md
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # provided by Actions
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: RELEASE.md
+          draft: true
+          prerelease: false
 # jobs:
 #   build:
 #     name: Create Release
